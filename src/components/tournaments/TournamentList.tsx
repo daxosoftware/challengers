@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Plus, Trophy } from 'lucide-react';
 import MemoizedTournamentCard from './MemoizedTournamentCard';
-import Input from '../ui/Input';
 import Button from '../ui/Button';
 import CreateTournamentModal from './CreateTournamentModal';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTournamentStore, useRealtimeStore } from '../../stores';
-import { useDebounce } from '../../hooks/useDebounce';
+
 import { usePerformanceMonitor } from '../../hooks/usePerformanceMonitor';
 
 export default function TournamentList() {
@@ -21,20 +20,16 @@ export default function TournamentList() {
   const {
     filteredTournaments,
     loading,
-    error,
     searchTerm,
     statusFilter,
     setSearchTerm,
     setStatusFilter,
     fetchTournaments,
-    createTournament,
-    clearError
-  } = useTournamentStore();
+    createTournament  } = useTournamentStore();
   
   const { subscribeToTournaments } = useRealtimeStore();
   
   // Debounced search for better performance
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   // Fetch tournaments on component mount
   useEffect(() => {
@@ -57,19 +52,13 @@ export default function TournamentList() {
     setCreateTournamentOpen(false);
   };
 
-
-
-  if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <LoadingSpinner size="lg" text="Chargement des tournois..." />
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
+      {loading ? (
+        <LoadingSpinner size="lg" text="Chargement des tournois..." />
+      ) : (
+        <>
+          {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8">
         <div className="mb-4 sm:mb-0">
           <h1 className="text-2xl md:text-3xl font-bold text-white mb-2 text-gradient-frog">Tournois</h1>
@@ -155,6 +144,8 @@ export default function TournamentList() {
         onClose={() => setCreateTournamentOpen(false)}
         onCreateTournament={handleCreateTournament}
       />
+        </>
+      )}
     </div>
   );
 }
