@@ -1,12 +1,34 @@
 import { supabase } from '../lib/supabase';
 import { Tournament, Participant, Match, ChatMessage, Notification } from '../types';
+import { DataSanitizer, ValidationSchemas, Validator } from '../utils/validation';
 
 // Tournament operations
 export const tournamentService = {
   async create(tournament: Omit<Tournament, 'id' | 'created_at' | 'updated_at' | 'organizer'>) {
+    // Sanitize input data
+    const sanitizedData = DataSanitizer.sanitizeObject(tournament, {
+      name: 'string',
+      description: 'string',
+      format: 'string',
+      max_participants: 'integer',
+      current_participants: 'integer',
+      status: 'string',
+      start_date: 'string',
+      organizer_id: 'string',
+      prize_pool: 'string',
+      entry_fee: 'number'
+    });
+
+    // Validate the sanitized data
+    const validation = Validator.validate(sanitizedData, ValidationSchemas.tournament);
+    if (!validation.isValid) {
+      const errorMessages = Object.values(validation.errors).join(', ');
+      throw new Error(`Données de tournoi invalides: ${errorMessages}`);
+    }
+
     const { data, error } = await supabase
       .from('tournaments')
-      .insert(tournament)
+      .insert(sanitizedData)
       .select(`
         *,
         organizer:profiles!organizer_id(*)
@@ -31,15 +53,23 @@ export const tournamentService = {
       .order('created_at', { ascending: false });
 
     if (filters?.status) {
-      query = query.eq('status', filters.status);
+      // Sanitize status filter
+      const sanitizedStatus = DataSanitizer.sanitizeString(filters.status);
+      query = query.eq('status', sanitizedStatus);
     }
 
     if (filters?.organizer_id) {
-      query = query.eq('organizer_id', filters.organizer_id);
+      // Sanitize organizer_id filter
+      const sanitizedOrganizerId = DataSanitizer.sanitizeString(filters.organizer_id);
+      query = query.eq('organizer_id', sanitizedOrganizerId);
     }
 
     if (filters?.search) {
-      query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+      // Sanitize search term to prevent injection
+      const sanitizedSearch = DataSanitizer.sanitizeString(filters.search);
+      if (sanitizedSearch.length > 0) {
+        query = query.or(`name.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%`);
+      }
     }
 
     const { data, error } = await query;
@@ -48,13 +78,19 @@ export const tournamentService = {
   },
 
   async getById(id: string) {
+    // Sanitize the ID parameter
+    const sanitizedId = DataSanitizer.sanitizeString(id);
+    if (!sanitizedId || sanitizedId.length === 0) {
+      throw new Error('ID de tournoi invalide');
+    }
+
     const { data, error } = await supabase
       .from('tournaments')
       .select(`
         *,
         organizer:profiles!organizer_id(*)
       `)
-      .eq('id', id)
+      .eq('id', sanitizedId)
       .single();
 
     if (error) throw error;
@@ -62,13 +98,38 @@ export const tournamentService = {
   },
 
   async update(id: string, updates: Partial<Tournament>) {
+    // Sanitize the ID parameter
+    const sanitizedId = DataSanitizer.sanitizeString(id);
+    if (!sanitizedId || sanitizedId.length === 0) {
+      throw new Error('ID de tournoi invalide');
+    }
+
+    // Sanitize update data
+    const sanitizedUpdates = DataSanitizer.sanitizeObject(updates, {
+      name: 'string',
+      description: 'string',
+      format: 'string',
+      max_participants: 'integer',
+      current_participants: 'integer',
+      status: 'string',
+      start_date: 'string',
+      prize_pool: 'string',
+      entry_fee: 'number'
+    });
+
+    // Validate the sanitized updates
+    const allowedFields = ['name', 'description', 'format', 'max_participants', 'status', 'start_date', 'prize_pool', 'entry_fee'];
+    const validatedUpdates = Object.fromEntries(
+      Object.entries(sanitizedUpdates).filter(([key]) => allowedFields.includes(key))
+    );
+
     const { data, error } = await supabase
       .from('tournaments')
       .update({
-        ...updates,
+        ...validatedUpdates,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', id)
+      .eq('id', sanitizedId)
       .select(`
         *,
         organizer:profiles!organizer_id(*)
@@ -80,10 +141,16 @@ export const tournamentService = {
   },
 
   async delete(id: string) {
+    // Sanitize the ID parameter
+    const sanitizedId = DataSanitizer.sanitizeString(id);
+    if (!sanitizedId || sanitizedId.length === 0) {
+      throw new Error('ID de tournoi invalide');
+    }
+
     const { error } = await supabase
       .from('tournaments')
       .delete()
-      .eq('id', id);
+      .eq('id', sanitizedId);
 
     if (error) throw error;
   },
@@ -102,11 +169,19 @@ export const tournamentService = {
 // Participant operations
 export const participantService = {
   async joinTournament(tournamentId: string, userId: string) {
+    // Sanitize input parameters
+    const sanitizedTournamentId = DataSanitizer.sanitizeString(tournamentId);
+    const sanitizedUserId = DataSanitizer.sanitizeString(userId);
+    
+    if (!sanitizedTournamentId || !sanitizedUserId) {
+      throw new Error('Paramètres invalides pour rejoindre le tournoi');
+    }
+
     const { data, error } = await supabase
       .from('participants')
       .insert({
-        tournament_id: tournamentId,
-        user_id: userId,
+        tournament_id: sanitizedTournamentId,
+        user_id: sanitizedUserId,
         status: 'registered',
       })
       .select(`
@@ -118,32 +193,46 @@ export const participantService = {
     if (error) throw error;
 
     // Update tournament participant count
-    await supabase.rpc('increment_participant_count', { tournament_id: tournamentId });
+    await supabase.rpc('increment_participant_count', { tournament_id: sanitizedTournamentId });
     
     return data;
   },
 
   async leaveTournament(tournamentId: string, userId: string) {
+    // Sanitize input parameters
+    const sanitizedTournamentId = DataSanitizer.sanitizeString(tournamentId);
+    const sanitizedUserId = DataSanitizer.sanitizeString(userId);
+    
+    if (!sanitizedTournamentId || !sanitizedUserId) {
+      throw new Error('Paramètres invalides pour quitter le tournoi');
+    }
+
     const { error } = await supabase
       .from('participants')
       .delete()
-      .eq('tournament_id', tournamentId)
-      .eq('user_id', userId);
+      .eq('tournament_id', sanitizedTournamentId)
+      .eq('user_id', sanitizedUserId);
 
     if (error) throw error;
 
     // Update tournament participant count
-    await supabase.rpc('decrement_participant_count', { tournament_id: tournamentId });
+    await supabase.rpc('decrement_participant_count', { tournament_id: sanitizedTournamentId });
   },
 
   async getTournamentParticipants(tournamentId: string) {
+    // Sanitize tournament ID
+    const sanitizedTournamentId = DataSanitizer.sanitizeString(tournamentId);
+    if (!sanitizedTournamentId) {
+      throw new Error('ID de tournoi invalide');
+    }
+
     const { data, error } = await supabase
       .from('participants')
       .select(`
         *,
         user:profiles!user_id(*)
       `)
-      .eq('tournament_id', tournamentId)
+      .eq('tournament_id', sanitizedTournamentId)
       .order('registered_at', { ascending: true });
 
     if (error) throw error;

@@ -153,11 +153,20 @@ export function useAuthProvider(): AuthContextType {
     try {
       setLoading(true);
 
-      // Validate CSRF token if available
+      // Ensure we have a valid session and CSRF token
+      if (!sessionId) {
+        throw new Error('Session invalide. Veuillez actualiser la page.');
+      }
+
+      // CSRF token validation is now mandatory
       const csrfToken = CSRFProtection.getToken();
-      if (csrfToken && sessionId && !CSRFProtection.validateToken(sessionId, csrfToken)) {
+      if (!csrfToken) {
+        throw new Error('Token CSRF manquant. Veuillez actualiser la page.');
+      }
+
+      if (!CSRFProtection.validateToken(sessionId, csrfToken)) {
         securityHelpers.logCSRFViolation();
-        throw new Error('Invalid CSRF token. Please refresh the page.');
+        throw new Error('Token CSRF invalide. Veuillez actualiser la page.');
       }
 
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -217,10 +226,20 @@ export function useAuthProvider(): AuthContextType {
     try {
       setLoading(true);
 
-      // Validate CSRF token
+      // Ensure we have a valid session for signup
+      if (!sessionId) {
+        throw new Error('Session invalide. Veuillez actualiser la page.');
+      }
+
+      // CSRF token validation is mandatory for signup
       const csrfToken = CSRFProtection.getToken();
-      if (csrfToken && sessionId && !CSRFProtection.validateToken(sessionId, csrfToken)) {
-        throw new Error('Invalid CSRF token. Please refresh the page.');
+      if (!csrfToken) {
+        throw new Error('Token CSRF manquant. Veuillez actualiser la page.');
+      }
+
+      if (!CSRFProtection.validateToken(sessionId, csrfToken)) {
+        securityHelpers.logCSRFViolation();
+        throw new Error('Token CSRF invalide. Veuillez actualiser la page.');
       }
 
       const { data, error } = await supabase.auth.signUp({

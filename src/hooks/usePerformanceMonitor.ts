@@ -17,8 +17,8 @@ export const usePerformanceMonitor = (componentName: string) => {
     return () => {
       const renderTime = performance.now() - renderStartTime.current;
       
-      // Log performance metrics in development
-      if (process.env.NODE_ENV === 'development') {
+      // Log performance metrics in development only
+      if (import.meta.env.DEV) {
         console.log(`[Performance] ${componentName}:`, {
           renderTime: `${renderTime.toFixed(2)}ms`,
           renderCount: renderCount.current,
@@ -26,10 +26,14 @@ export const usePerformanceMonitor = (componentName: string) => {
         });
       }
 
-      // Send metrics to analytics in production
-      if (process.env.NODE_ENV === 'production' && renderTime > 16) { // 60fps threshold
-        // You could send this to your analytics service
-        console.warn(`[Performance Warning] ${componentName} took ${renderTime.toFixed(2)}ms to render`);
+      // Send metrics to analytics in production (silent)
+      if (import.meta.env.PROD && renderTime > 16) { // 60fps threshold
+        // Send to analytics service instead of console
+        // analyticsService.track('performance_warning', {
+        //   component: componentName,
+        //   renderTime,
+        //   timestamp: Date.now()
+        // });
       }
     };
   });
@@ -41,7 +45,7 @@ export const useRenderCount = (componentName: string) => {
   useEffect(() => {
     renderCount.current += 1;
     
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log(`[Render Count] ${componentName}: ${renderCount.current}`);
     }
   });

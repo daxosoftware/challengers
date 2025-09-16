@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { ToastProvider } from './contexts/ToastContext';
 import Header from './components/layout/Header';
 import AnimatedBackground from './components/ui/AnimatedBackground';
 import { useAuth } from './contexts/AuthContext';
@@ -100,9 +101,11 @@ function App() {
     >
       <AuthErrorBoundary>
         <AuthProvider>
-          <Router>
-            <AppContent />
-          </Router>
+          <ToastProvider position="top-right" maxToasts={5}>
+            <Router>
+              <AppContent />
+            </Router>
+          </ToastProvider>
         </AuthProvider>
       </AuthErrorBoundary>
     </ErrorBoundary>

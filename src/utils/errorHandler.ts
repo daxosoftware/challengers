@@ -100,27 +100,56 @@ export class ErrorHandler {
   }
 }
 
-// Toast notification utility
-export const showErrorToast = (error: any) => {
+// Toast notification utilities
+// Note: These functions should be used with the ToastContext
+// For direct usage without context, import and use the toast context directly
+
+export const createErrorMessage = (error: any): { title: string; message?: string } => {
   const appError = ErrorHandler.handle(error);
   
-  // You can integrate with a toast library here
-  // For now, we'll use a simple alert
-  if (typeof window !== 'undefined') {
-    // Check if we're in a browser environment
-    console.error('Error:', appError);
-    
-    // You can replace this with a proper toast notification
-    // toast.error(appError.message);
+  // Create user-friendly error messages
+  let title = 'Erreur';
+  let message = appError.message;
+  
+  if (ErrorHandler.isNetworkError(error)) {
+    title = 'Problème de connexion';
+  } else if (ErrorHandler.isAuthError(error)) {
+    title = 'Erreur d\'authentification';
+  } else if (ErrorHandler.isValidationError(error)) {
+    title = 'Données invalides';
+  }
+  
+  return { title, message };
+};
+
+export const createSuccessMessage = (action: string, details?: string): { title: string; message?: string } => {
+  const actionMessages: Record<string, string> = {
+    'tournament_created': 'Tournoi créé avec succès',
+    'tournament_joined': 'Inscription confirmée',
+    'tournament_left': 'Désinscription effectuée',
+    'profile_updated': 'Profil mis à jour',
+    'login': 'Connexion réussie',
+    'logout': 'Déconnexion effectuée',
+    'signup': 'Compte créé avec succès',
+  };
+  
+  return {
+    title: actionMessages[action] || 'Opération réussie',
+    message: details
+  };
+};
+
+// Legacy functions for backward compatibility - these will log warnings
+export const showErrorToast = (error: any) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.warn('showErrorToast is deprecated. Use useToast().showError() instead.');
+    console.error('Error:', ErrorHandler.handle(error));
   }
 };
 
-// Success notification utility
 export const showSuccessToast = (message: string) => {
-  if (typeof window !== 'undefined') {
+  if (process.env.NODE_ENV === 'development') {
+    console.warn('showSuccessToast is deprecated. Use useToast().showSuccess() instead.');
     console.log('Success:', message);
-    
-    // You can replace this with a proper toast notification
-    // toast.success(message);
   }
 };

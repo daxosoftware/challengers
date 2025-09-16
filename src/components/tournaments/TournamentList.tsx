@@ -5,18 +5,32 @@ import Button from '../ui/Button';
 import CreateTournamentModal from './CreateTournamentModal';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../contexts/ToastContext';
 import { useTournamentStore, useRealtimeStore } from '../../stores';
-
 import { usePerformanceMonitor } from '../../hooks/usePerformanceMonitor';
+import { useDebounce } from '../../hooks/useDebounce';
+import { Tournament } from '../../types';
+import { createSuccessMessage, createErrorMessage } from '../../utils/errorHandler';
+
+interface CreateTournamentData {
+  name: string;
+  description: string;
+  format: string;
+  participantCount: string;
+}
 
 export default function TournamentList() {
   const { user } = useAuth();
+  const { showSuccess, showError, showInfo } = useToast();
   const [createTournamentOpen, setCreateTournamentOpen] = useState(false);
+  const [localSearchTerm, setLocalSearchTerm] = useState('');
   
   // Performance monitoring
   usePerformanceMonitor('TournamentList');
   
-  // Zustand stores
+  // Debounced search for better performance
+  const debouncedSearchTerm = useDebounce(localSearchTerm, 300);
+  
   const {
     filteredTournaments,
     loading,
@@ -25,11 +39,22 @@ export default function TournamentList() {
     setSearchTerm,
     setStatusFilter,
     fetchTournaments,
-    createTournament  } = useTournamentStore();
+    createTournament,
+    joinTournament,
+    viewTournament
+  } = useTournamentStore();
   
   const { subscribeToTournaments } = useRealtimeStore();
   
-  // Debounced search for better performance
+  // Update store search term when debounced value changes
+  useEffect(() => {
+    setSearchTerm(debouncedSearchTerm);
+  }, [debouncedSearchTerm, setSearchTerm]);
+  
+  // Initialize local search term from store
+  useEffect(() => {
+    setLocalSearchTerm(searchTerm);
+  }, []);
 
   // Fetch tournaments on component mount
   useEffect(() => {
@@ -37,19 +62,54 @@ export default function TournamentList() {
     subscribeToTournaments();
   }, [fetchTournaments, subscribeToTournaments]);
 
-  const handleCreateTournament = async (tournamentData: any) => {
-    await createTournament({
-      name: tournamentData.name,
-      description: tournamentData.description,
-      format: tournamentData.format === 'fixtures' ? 'single_elimination' : 'round_robin',
-      max_participants: parseInt(tournamentData.participantCount),
-      current_participants: 0,
-      status: 'draft',
-      start_date: new Date().toISOString(),
-      organizer_id: user?.id || '',
-    });
-    
-    setCreateTournamentOpen(false);
+  const handleCreateTournament = async (tournamentData: CreateTournamentData) => {
+    try {
+      await createTournament({
+        name: tournamentData.name,
+        description: tournamentData.description,
+        format: tournamentData.format === 'fixtures' ? 'single_elimination' : 'round_robin',
+        max_participants: parseInt(tournamentData.participantCount),
+        current_participants: 0,
+        status: 'draft',
+        start_date: new Date().toISOString(),
+        organizer_id: user?.id || '',
+      });
+      
+      const { title, message } = createSuccessMessage('tournament_created', tournamentData.name);
+      showSuccess(title, message);
+      setCreateTournamentOpen(false);
+    } catch (error) {
+      const { title, message } = createErrorMessage(error);
+      showError(title, message);
+    }
+  };
+
+  const handleViewTournament = (tournamentId: string) => {
+    try {
+      viewTournament(tournamentId);
+      // TODO: Navigate to tournament detail page
+      // For now, we'll show a success message
+      showInfo('Navigation', `Affichage du tournoi ${tournamentId}`);
+    } catch (error) {
+      const { title, message } = createErrorMessage(error);
+      showError(title, message);
+    }
+  };
+
+  const handleJoinTournament = async (tournamentId: string) => {
+    if (!user) {
+      showError('Authentification requise', 'Vous devez être connecté pour rejoindre un tournoi');
+      return;
+    }
+
+    try {
+      await joinTournament(tournamentId, user.id);
+      const { title, message } = createSuccessMessage('tournament_joined');
+      showSuccess(title, message);
+    } catch (error) {
+      const { title, message } = createErrorMessage(error);
+      showError(title, message);
+    }
   };
 
   return (
@@ -83,8 +143,8 @@ export default function TournamentList() {
               <input
                 type="text"
                 placeholder="Rechercher un tournoi..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={localSearchTerm}
+                onChange={(e) => setLocalSearchTerm(e.target.value)}
                 className="input-glass w-full pl-10 pr-4 py-2 rounded-lg text-white placeholder-white/60"
               />
             </div>
@@ -132,8 +192,8 @@ export default function TournamentList() {
             <MemoizedTournamentCard
               key={tournament.id}
               tournament={tournament}
-              onView={(tournamentId) => console.log('View tournament:', tournamentId)}
-              onJoin={(tournamentId) => console.log('Join tournament:', tournamentId)}
+              onView={handleViewTournament}
+              onJoin={handleJoinTournament}
             />
           ))}
         </div>

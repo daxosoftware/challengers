@@ -37,6 +37,9 @@ interface TournamentState {
   createTournament: (tournament: Omit<Tournament, 'id' | 'created_at' | 'updated_at' | 'organizer'>) => Promise<void>;
   updateTournament: (id: string, updates: Partial<Tournament>) => Promise<void>;
   deleteTournament: (id: string) => Promise<void>;
+  joinTournament: (tournamentId: string, userId: string) => Promise<void>;
+  leaveTournament: (tournamentId: string, userId: string) => Promise<void>;
+  viewTournament: (tournamentId: string) => void;
   
   // UI Actions
   setSearchTerm: (term: string) => void;
@@ -271,6 +274,74 @@ export const useTournamentStore = create<TournamentState>()(
             set({ error: appError.message });
           } finally {
             set({ loading: false });
+          }
+        },
+
+        joinTournament: async (tournamentId, userId) => {
+          try {
+            set({ loading: true, error: null });
+            
+            // Import participantService dynamically to avoid circular dependency
+            const { participantService } = await import('../services/database');
+            await participantService.joinTournament(tournamentId, userId);
+            
+            // Update the tournament participant count locally
+            set(state => ({
+              tournaments: state.tournaments.map(t => 
+                t.id === tournamentId 
+                  ? { ...t, current_participants: t.current_participants + 1 }
+                  : t
+              ),
+              currentTournament: state.currentTournament?.id === tournamentId
+                ? { ...state.currentTournament, current_participants: state.currentTournament.current_participants + 1 }
+                : state.currentTournament
+            }));
+            
+          } catch (error) {
+            const appError = ErrorHandler.handle(error);
+            set({ error: `Erreur lors de l'inscription: ${appError.message}` });
+            throw error; // Re-throw for component handling
+          } finally {
+            set({ loading: false });
+          }
+        },
+
+        leaveTournament: async (tournamentId, userId) => {
+          try {
+            set({ loading: true, error: null });
+            
+            const { participantService } = await import('../services/database');
+            await participantService.leaveTournament(tournamentId, userId);
+            
+            // Update the tournament participant count locally
+            set(state => ({
+              tournaments: state.tournaments.map(t => 
+                t.id === tournamentId 
+                  ? { ...t, current_participants: Math.max(0, t.current_participants - 1) }
+                  : t
+              ),
+              currentTournament: state.currentTournament?.id === tournamentId
+                ? { ...state.currentTournament, current_participants: Math.max(0, state.currentTournament.current_participants - 1) }
+                : state.currentTournament
+            }));
+            
+          } catch (error) {
+            const appError = ErrorHandler.handle(error);
+            set({ error: `Erreur lors de la désinscription: ${appError.message}` });
+            throw error; // Re-throw for component handling
+          } finally {
+            set({ loading: false });
+          }
+        },
+
+        viewTournament: (tournamentId) => {
+          // Set current tournament for navigation
+          const tournament = get().tournaments.find(t => t.id === tournamentId);
+          if (tournament) {
+            set({ currentTournament: tournament });
+          } else {
+            // Fetch tournament if not in current list
+            get().fetchTournamentById(tournamentId);
           }
         },
 

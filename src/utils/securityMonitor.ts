@@ -56,12 +56,15 @@ export class SecurityMonitor {
       try {
         listener(event);
       } catch (error) {
-        console.error('Security monitor listener error:', error);
+        if (import.meta.env.DEV) {
+          console.error('Security monitor listener error:', error);
+        }
+        // In production, silently continue or send to error monitoring service
       }
     });
 
-    // Console log for development
-    if (process.env.NODE_ENV === 'development') {
+    // Console log for development only
+    if (import.meta.env.DEV) {
       console.warn(`[SECURITY] ${type}:`, details);
     }
 
