@@ -3,8 +3,8 @@ import { supabase } from '../lib/supabase';
 import { fetchUserProfile, updateUserProfile } from '../services/database';
 import { RateLimiter, CSRFProtection, SessionSecurity } from '../utils/validation';
 import { ErrorHandler } from '../utils/errorHandler';
-import { SecurityMonitor, securityHelpers, SecurityEventTypes } from '../utils/securityMonitor';
-import { getRateLimitConfig } from '../config/authSecurity';
+import { SecurityMonitor, securityHelpers } from '../utils/securityMonitor';
+import { getRateLimitConfig, SecurityEventTypes } from '../config/securityConfig';
 
 export interface User {
   id: string;

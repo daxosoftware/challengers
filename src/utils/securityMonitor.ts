@@ -1,25 +1,19 @@
 import React from 'react';
-import { SecurityEventType, SecurityEventTypes, SecurityMetrics, defaultSecurityMetrics } from '../config/authSecurity';
-
-// Security event data structure
-export interface SecurityEvent {
-  id: string;
-  type: SecurityEventType;
-  timestamp: number;
-  userId?: string;
-  ip?: string;
-  userAgent?: string;
-  details: Record<string, any>;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  resolved?: boolean;
-}
+import { 
+  SecurityEventType, 
+  SecurityEventTypes, 
+  SecurityMetrics, 
+  defaultSecurityMetrics,
+  SecurityEvent,
+  SecurityConfig
+} from '../config/securityConfig';
 
 // Security monitoring class
 export class SecurityMonitor {
   private static events: SecurityEvent[] = [];
   private static metrics: SecurityMetrics = { ...defaultSecurityMetrics };
   private static listeners: ((event: SecurityEvent) => void)[] = [];
-  private static maxEvents = 1000; // Keep last 1000 events in memory
+  private static maxEvents = SecurityConfig.monitoring.maxLogEntries;
 
   // Log a security event
   static logEvent(
@@ -28,12 +22,16 @@ export class SecurityMonitor {
     severity: SecurityEvent['severity'] = 'medium',
     userId?: string
   ): void {
+    if (!SecurityConfig.monitoring.enableSecurityLogs) {
+      return;
+    }
+
     const event: SecurityEvent = {
       id: this.generateEventId(),
       type,
       timestamp: Date.now(),
       userId,
-      ip: this.getClientIP(),
+      ipAddress: this.getClientIP(),
       userAgent: this.getUserAgent(),
       details,
       severity,
@@ -105,11 +103,11 @@ export class SecurityMonitor {
     console.error('[CRITICAL SECURITY EVENT]', event);
     
     // Auto-block IP for critical events
-    if (event.ip && (
+    if (event.ipAddress && (
       event.type === SecurityEventTypes.BRUTE_FORCE_ATTEMPT ||
       event.type === SecurityEventTypes.SESSION_HIJACK_ATTEMPT
     )) {
-      this.blockIP(event.ip, 'Critical security event detected');
+      this.blockIP(event.ipAddress, 'Critical security event detected');
     }
   }
 
@@ -190,13 +188,13 @@ export class SecurityMonitor {
     if (ip) {
       const failedAttemptsFromIP = recentEvents.filter(
         event => 
-          event.ip === ip &&
+          event.ipAddress === ip &&
           event.timestamp > (currentTime - timeWindow) &&
           (event.type === SecurityEventTypes.BRUTE_FORCE_ATTEMPT ||
            event.type === SecurityEventTypes.MULTIPLE_FAILED_LOGINS)
       );
 
-      if (failedAttemptsFromIP.length >= 5) {
+      if (failedAttemptsFromIP.length >= SecurityConfig.monitoring.suspiciousActivityThreshold / 2) {
         this.logEvent(
           SecurityEventTypes.SUSPICIOUS_LOGIN_PATTERN,
           { ip, failedAttempts: failedAttemptsFromIP.length },
@@ -295,9 +293,6 @@ export const useSecurityMonitor = () => {
   };
 };
 
-// Export for use in other components
-export { SecurityEventTypes };
-
 // Helper functions for common security checks
 export const securityHelpers = {
   // Check if user should be presented with CAPTCHA
@@ -306,7 +301,7 @@ export const securityHelpers = {
     const failedAttempts = recentEvents.filter(
       event => 
         (userId && event.userId === userId) ||
-        (ip && event.ip === ip) &&
+        (ip && event.ipAddress === ip) &&
         event.type === SecurityEventTypes.MULTIPLE_FAILED_LOGINS
     );
     
