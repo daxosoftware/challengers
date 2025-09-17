@@ -12,6 +12,25 @@ class RetryableError extends Error {
   }
 }
 
+// Database schema error detection
+const isDatabaseSchemaError = (error: any): boolean => {
+  return error?.code === 'PGRST205' || 
+         error?.message?.includes('Could not find the table') ||
+         error?.message?.includes('schema cache');
+};
+
+const getDatabaseSchemaErrorMessage = (): string => {
+  return `Database schema not found. Please set up your Supabase database:
+
+1. Go to your Supabase dashboard
+2. Navigate to SQL Editor
+3. Copy the content from 'database-schema.sql'
+4. Paste and run it in the SQL Editor
+5. Refresh this page
+
+See SUPABASE_SETUP.md for detailed instructions.`;
+};
+
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 
@@ -223,6 +242,13 @@ export const useTournamentStore = create<TournamentState>()(
             return newTournament;
             
           } catch (error) {
+            // Check for database schema errors
+            if (isDatabaseSchemaError(error)) {
+              set({ error: getDatabaseSchemaErrorMessage() });
+              console.error('Database schema error:', error);
+              return null;
+            }
+            
             const appError = ErrorHandler.handle(error);
             set({ error: `Erreur lors de la création: ${appError.message}` });
             
