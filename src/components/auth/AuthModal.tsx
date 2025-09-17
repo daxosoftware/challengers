@@ -32,6 +32,30 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }: Aut
 
   const { signIn, signUp, resetPassword, verifyCSRF, getSessionSecurity } = useAuth();
 
+  // Move useCallback hooks before conditional return to ensure they're always called
+  const handleInputChange = useCallback((field: string, value: string) => {
+    // Clear rate limit when user starts typing
+    if (isRateLimited) {
+      setIsRateLimited(false);
+      setRateLimitTime(0);
+    }
+    
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear errors when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+    if (validationErrors[field]) {
+      setValidationErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  }, [errors, validationErrors, isRateLimited]);
+  
+  // Real-time validation helper
+  const getFieldError = useCallback((field: string) => {
+    return validationErrors[field] || errors[field];
+  }, [validationErrors, errors]);
+
   // Initialize CSRF protection and monitor session security
   useEffect(() => {
     if (isOpen) {
@@ -165,29 +189,6 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }: Aut
       setLoading(false);
     }
   };
-
-  const handleInputChange = useCallback((field: string, value: string) => {
-    // Clear rate limit when user starts typing
-    if (isRateLimited) {
-      setIsRateLimited(false);
-      setRateLimitTime(0);
-    }
-    
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Clear errors when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-    if (validationErrors[field]) {
-      setValidationErrors(prev => ({ ...prev, [field]: '' }));
-    }
-  }, [errors, validationErrors, isRateLimited]);
-  
-  // Real-time validation helper
-  const getFieldError = useCallback((field: string) => {
-    return validationErrors[field] || errors[field];
-  }, [validationErrors, errors]);
 
   // Rate limit display helper
   const formatRateLimitTime = (ms: number) => {
