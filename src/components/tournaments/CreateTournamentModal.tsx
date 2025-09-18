@@ -18,6 +18,8 @@ export default function CreateTournamentModal({
   onClose, 
   onCreateTournament 
 }: CreateTournamentModalProps) {
+  if (!isOpen) return null;
+
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
@@ -30,8 +32,6 @@ export default function CreateTournamentModal({
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [bracket, setBracket] = useState<Match[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
-
-  if (!isOpen) return null;
 
   // Enhanced form validation using validation system
   const validateForm = () => {
