@@ -198,17 +198,17 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }: Aut
 
   return (
     <AuthErrorBoundary>
-      <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="fixed inset-0 z-[9999] overflow-y-auto">
         <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
           <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-            <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={onClose}></div>
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
           </div>
 
-        <div className="inline-block align-bottom modal-glass px-4 pt-5 pb-4 text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full sm:p-6">
+        <div className="inline-block align-bottom modal-glass px-4 pt-5 pb-4 text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full sm:p-6 relative z-10">
           <div className="absolute top-0 right-0 pt-4 pr-4">
             <button
               onClick={onClose}
-              className="glass rounded-xl text-white/60 hover:text-frog-primary hover:scale-110 transition-all duration-300 p-2"
+              className="glass rounded-xl text-white/60 hover:text-frog-primary hover:scale-110 transition-all duration-300 p-2 relative z-20"
             >
               <X className="h-6 w-6" />
             </button>
