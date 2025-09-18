@@ -11,27 +11,7 @@ interface CreateTournamentModalProps {
   onClose: () => void;
   onCreateTournament: (tournament: any) => void;
 }
-
-interface Participant {
-  id: string;
-  name: string;
-  seed: number;
-}
-
-interface Match {
-  id: string;
-  participant1?: Participant;
-  participant2?: Participant;
-  winner?: Participant;
-  round: number;
-  matchNumber: number;
-}
-
-interface Group {
-  name: string;
-  participants: Participant[];
-  matches: Match[];
-}
+import { Participant, Match, Group, generateFixturesBracket, generateGroupStage } from '../../utils/tournamentBracketGenerator';
 
 export default function CreateTournamentModal({ 
   isOpen, 
@@ -157,142 +137,14 @@ export default function CreateTournamentModal({
     return validationErrors[field] || errors[field];
   }, [validationErrors, errors]);
 
-  // Generate fixtures format bracket
-  const generateFixturesBracket = () => {
-    const matches: Match[] = [];
-    const totalParticipants = participants.length;
-    
-    // Handle odd number of participants (one gets a bye)
-    const participantsInFirstRound = totalParticipants % 2 === 0 
-      ? participants 
-      : participants.slice(0, -1);
-
-    // First round matches
-    for (let i = 0; i < participantsInFirstRound.length; i += 2) {
-      matches.push({
-        id: `match-1-${i/2 + 1}`,
-        participant1: participantsInFirstRound[i],
-        participant2: participantsInFirstRound[i + 1],
-        round: 1,
-        matchNumber: i/2 + 1
-      });
-    }
-
-    // If odd number, add bye match
-    if (totalParticipants % 2 !== 0) {
-      matches.push({
-        id: `match-1-bye`,
-        participant1: participants[participants.length - 1],
-        winner: participants[participants.length - 1],
-        round: 1,
-        matchNumber: Math.ceil(participantsInFirstRound.length / 2) + 1
-      });
-    }
-
-    // Generate subsequent rounds
-    let currentRoundMatches = matches.length;
-    let round = 2;
-    
-    while (currentRoundMatches > 1) {
-      const nextRoundMatches = Math.ceil(currentRoundMatches / 2);
-      
-      for (let i = 0; i < nextRoundMatches; i++) {
-        matches.push({
-          id: `match-${round}-${i + 1}`,
-          round,
-          matchNumber: i + 1
-        });
-      }
-      
-      currentRoundMatches = nextRoundMatches;
-      round++;
-    }
-
-    setBracket(matches);
-  };
-
-  // Generate group stage format
-  const generateGroupStage = () => {
-    const totalParticipants = participants.length;
-    const groupCount = Math.min(4, Math.ceil(totalParticipants / 4));
-    const newGroups: Group[] = [];
-
-    // Create groups
-    for (let i = 0; i < groupCount; i++) {
-      newGroups.push({
-        name: String.fromCharCode(65 + i), // A, B, C, D
-        participants: [],
-        matches: []
-      });
-    }
-
-    // Distribute participants into groups
-    participants.forEach((participant, index) => {
-      const groupIndex = index % groupCount;
-      newGroups[groupIndex].participants.push(participant);
-    });
-
-    // Generate matches within each group (round robin)
-    newGroups.forEach(group => {
-      const groupParticipants = group.participants;
-      let matchNumber = 1;
-
-      for (let i = 0; i < groupParticipants.length; i++) {
-        for (let j = i + 1; j < groupParticipants.length; j++) {
-          group.matches.push({
-            id: `group-${group.name}-match-${matchNumber}`,
-            participant1: groupParticipants[i],
-            participant2: groupParticipants[j],
-            round: 1,
-            matchNumber
-          });
-          matchNumber++;
-        }
-      }
-    });
-
-    setGroups(newGroups);
-
-    // Generate knockout bracket for group winners
-    const knockoutMatches: Match[] = [];
-    const qualifiers = newGroups.length;
-
-    for (let i = 0; i < Math.floor(qualifiers / 2); i++) {
-      knockoutMatches.push({
-        id: `knockout-1-${i + 1}`,
-        round: 1,
-        matchNumber: i + 1
-      });
-    }
-
-    // Generate subsequent knockout rounds
-    let currentRoundMatches = Math.floor(qualifiers / 2);
-    let round = 2;
-    
-    while (currentRoundMatches > 1) {
-      const nextRoundMatches = Math.ceil(currentRoundMatches / 2);
-      
-      for (let i = 0; i < nextRoundMatches; i++) {
-        knockoutMatches.push({
-          id: `knockout-${round}-${i + 1}`,
-          round,
-          matchNumber: i + 1
-        });
-      }
-      
-      currentRoundMatches = nextRoundMatches;
-      round++;
-    }
-
-    setBracket(knockoutMatches);
-  };
-
   // Generate bracket based on format
   const generateBracket = () => {
     if (formData.format === 'fixtures') {
-      generateFixturesBracket();
+      setBracket(generateFixturesBracket(participants));
     } else {
-      generateGroupStage();
+      const { groups: generatedGroups, knockoutBracket } = generateGroupStage(participants);
+      setGroups(generatedGroups);
+      setBracket(knockoutBracket);
     }
     setStep(3);
   };
