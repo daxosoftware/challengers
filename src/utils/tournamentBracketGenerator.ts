@@ -1,4 +1,3 @@
-```typescript
 // src/utils/tournamentBracketGenerator.ts
 
 export interface Participant {
@@ -60,7 +59,7 @@ export function generateFixturesBracket(participants: Participant[]): Match[] {
   // Create matches for the first round
   for (let i = 0; i < playersInFirstRound.length; i += 2) {
     matches.push({
-      id: \`match-1-${matches.length + 1}`,
+      id: `match-1-${matches.length + 1}`,
       participant1: playersInFirstRound[i],
       participant2: playersInFirstRound[i + 1],
       round: 1,
@@ -71,7 +70,7 @@ export function generateFixturesBracket(participants: Participant[]): Match[] {
   // Add bye matches (these players advance directly to round 2)
   playersWithByes.forEach(player => {
     matches.push({
-      id: \`match-1-bye-${player.id}`,
+      id: `match-1-bye-${player.id}`,
       participant1: player,
       winner: player, // Player with bye automatically wins this "match"
       round: 1,
@@ -90,7 +89,7 @@ export function generateFixturesBracket(participants: Participant[]): Match[] {
     
     for (let i = 0; i < nextRoundMatchesCount; i++) {
       matches.push({
-        id: \`match-${round}-${i + 1}`,
+        id: `match-${round}-${i + 1}`,
         round,
         matchNumber: i + 1
       });
@@ -136,7 +135,7 @@ export function generateGroupStage(participants: Participant[]): { groups: Group
     for (let i = 0; i < groupParticipants.length; i++) {
       for (let j = i + 1; j < groupParticipants.length; j++) {
         group.matches.push({
-          id: \`group-${group.name}-match-${matchNumber}`,
+          id: `group-${group.name}-match-${matchNumber}`,
           participant1: groupParticipants[i],
           participant2: groupParticipants[j],
           round: 1, // Group stage matches are all round 1 conceptually
@@ -157,7 +156,7 @@ export function generateGroupStage(participants: Participant[]): { groups: Group
     // First round of knockout (e.g., Quarter-finals if 8 qualifiers)
     for (let i = 0; i < Math.floor(totalQualifiers / 2); i++) {
       knockoutMatches.push({
-        id: \`knockout-1-${i + 1}`,
+        id: `knockout-1-${i + 1}`,
         round: 1,
         matchNumber: i + 1
       });
@@ -172,7 +171,7 @@ export function generateGroupStage(participants: Participant[]): { groups: Group
       
       for (let i = 0; i < nextRoundMatchesCount; i++) {
         knockoutMatches.push({
-          id: \`knockout-${round}-${i + 1}`,
+          id: `knockout-${round}-${i + 1}`,
           round,
           matchNumber: i + 1
         });
@@ -185,4 +184,3 @@ export function generateGroupStage(participants: Participant[]): { groups: Group
 
   return { groups: newGroups, knockoutBracket: knockoutMatches };
 }
-```
