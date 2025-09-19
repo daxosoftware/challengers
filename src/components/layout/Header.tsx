@@ -224,7 +224,7 @@ export default function Header() {
               {!user && (
                 <div className="pt-4 space-y-3">
                   <Button 
-                    variant="glass" 
+                    variant="frog" 
                     className="w-full justify-center py-3"
                     onClick={() => {
                       setAuthModalTab('login');
