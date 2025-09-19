@@ -140,7 +140,7 @@ export default function Header() {
             ) : (
               <div className="flex items-center space-x-3">
                 <Button 
-                  variant="glass"
+                  variant="frog"
                   onClick={() => {
                     setAuthModalTab('login');
                     setAuthModalOpen(true);
