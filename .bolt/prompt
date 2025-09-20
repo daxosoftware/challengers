@@ -3,6 +3,7 @@ For all designs I ask you to make, have them be beautiful, not cookie cutter. Ma
 By default, this template supports JSX syntax with Tailwind CSS classes, React hooks, and Lucide React for icons. Do not install other packages for UI themes, icons, etc unless absolutely necessary or I request them.
 
 Use icons from lucide-react for logos.# Product Requirements Document: Versus
+# Product Requirements Document: Versus
 
 ## 1\. Overview
 
@@ -453,483 +454,596 @@ Versus is a modern tournament management web application designed to revolutioni
 * Generate communication reports for sponsors and stakeholders
 # Implementation Plan Overview
 
-Based on the PRD analysis, Versus will be implemented as a modern web application with PWA capabilities. The development will be divided into 9 phases focusing on progressive feature implementation, robust back-end integration, and comprehensive testing.
+This implementation plan outlines the development of **Versus**, a modern tournament management web application, structured into 9 comprehensive phases:
 
-**Phases:**
+**Front-End Implementation (Phases 1-4):**
 
-1. **Front-End Foundation** \- Core UI components and routing
-2. **Tournament Management Frontend** \- Bracket visualization and tournament pages
-3. **User Interface & Animations** \- Advanced animations and user interactions
-4. **Communication & Notification Frontend** \- Messaging and notification systems
-5. **Authentication & User Management** \- Complete authentication flow
-6. **Core Backend Integration** \- Tournament and user data management
-7. **Real-time Features & External APIs** \- Live updates and third\-party integrations
-8. **Advanced Features & Monetization** \- Sponsor system and premium features
-9. **Review & Quality Assurance** \- Code refinement and final testing
+* Phase 1: Core UI Foundation & Landing Page
+* Phase 2: Authentication & User Management UI
+* Phase 3: Tournament Management & Bracket Visualization
+* Phase 4: Communication Systems & Advanced Features
+
+**Authentication (Phase 5):**
+
+* Phase 5: Complete Authentication System
+
+**Back-End Integration (Phases 6-7):**
+
+* Phase 6: Core Tournament & Real-time Features
+* Phase 7: Communication, Notifications & Third-party Integrations
+
+**Review Phase (Phases 8-9):**
+
+* Phase 8: Testing, Optimization & PWA Implementation
+* Phase 9: Final Review, Security Audit & Launch Preparation
 
 ***
 
-## Phase 1: Front-End Foundation
+## Phase 1: Core UI Foundation & Landing Page
 
-**Objective:** Establish the basic application structure, routing, and core UI components
+**Objective:** Establish the foundational React application structure, design system, and implement the landing page with core navigation components.
 
 ### Detailed Tasks:
 
-1. **Project Setup**
-    * Initialize Vite React TypeScript project
-    * Configure Tailwind CSS with custom color palette from PRD
-    * Install core dependencies: React Router, Framer Motion, React Query
-    * Set up project folder structure: `/src/components`, `/src/pages`, `/src/hooks`, `/src/types`
-    * Configure TypeScript interfaces for core entities (Tournament, User, Match)
-2. **Navigation & Layout Components**
-    * Create `Header` component with primary navigation
-    * Implement `Navigation` component with responsive hamburger menu
-    * Build `Layout` component wrapper with consistent spacing
-    * Create `Breadcrumb` component for deep navigation
+1. **Project Setup & Configuration**
+    * Initialize Vite + React + TypeScript project
+    * Configure Tailwind CSS with custom color palette and typography
+    * Install and configure Framer Motion for animations
+    * Set up React Query for data fetching
+    * Configure project structure with folders: components, pages, hooks, utils, types
+    * Install notification library (react-hot-toast)
+    * Set up React Email Editor for announcement composition
+2. **Design System Implementation**
+    * Create color palette constants in Tailwind config
+    * Implement typography system (Inter for headings/body, JetBrains Mono for technical data)
+    * Build reusable UI components:
+        * Button component with variants (primary, secondary, accent, success, warning, error)
+        * Card component for tournament displays
+        * Input components (text, email, password, textarea)
+        * Modal component for dialogs
+        * Toast notification component
+        * Loading spinner and skeleton components
+        * Badge component for notification counts
+3. **Navigation & Layout Components**
+    * Create responsive header component with primary navigation
+    * Implement mobile hamburger menu for screens < 768px
+    * Build breadcrumb navigation component
+    * Create footer component with links and company information
     * Implement notification badge system for nav items
-3. **Landing Page Implementation**
-    * Build hero section with animated bracket preview using Framer Motion
-    * Create feature highlight cards with hover animations
-    * Implement responsive banner carousel for sponsor content
-    * Add call-to-action buttons with proper routing
-    * Build footer component with links and company information
-4. **Core UI Components**
-    * Create reusable `Button` component with variants (primary, secondary, outline)
-    * Build `Card` component with consistent styling
-    * Implement `Modal` component with backdrop and animations
-    * Create `Input`, `Select`, and `Textarea` form components
-    * Build `Badge` component for status indicators
-    * Create `Spinner` loading component
-5. **Routing Configuration**
-    * Set up React Router with all main routes from PRD
-    * Implement protected route wrapper for authenticated pages
-    * Configure lazy loading for code splitting
-    * Add 404 error page with navigation back to home
+    * Build responsive grid system for bracket displays
+4. **Landing Page Implementation (`/`)**
+    * Hero section with animated tournament bracket preview using Framer Motion
+    * Feature highlights section with interactive demonstrations
+    * Rotating sponsor banner carousel component
+    * Call-to-action buttons with hover animations
+    * Mobile-responsive sponsor banner integration
+    * Footer with links and social media integration
+    * Smooth scroll animations between sections
+5. **Responsive Design & Accessibility**
+    * Implement mobile-first responsive design
+    * Ensure high contrast ratios for accessibility
+    * Add ARIA labels and keyboard navigation support
+    * Test and optimize for screen readers
+    * Implement dark mode toggle functionality
 
 ### Expected Deliverables:
 
-* Fully functional landing page with responsive design
-* Complete navigation system with routing
-* Reusable UI component library
-* Consistent color scheme and typography implementation
-* Mobile-responsive layout structure
+* Fully configured React + Vite + TypeScript project
+* Complete design system with reusable components
+* Responsive landing page with animations
+* Navigation system with mobile support
+* Sponsor banner integration framework
 
 ***
 
-## Phase 2: Tournament Management Frontend
+## Phase 2: Authentication & User Management UI
 
-**Objective:** Implement tournament creation, viewing, and bracket visualization interfaces
+**Objective:** Build all authentication-related UI components and user profile management interfaces.
 
 ### Detailed Tasks:
 
-1. **Tournament Browser Page**
-    * Create tournament grid layout with filter sidebar
-    * Implement search functionality with debounced input
-    * Build tournament cards showing key information (name, status, participant count)
-    * Add category tabs (public, private, featured, sponsored)
-    * Implement pagination with load more functionality
-    * Create tournament status indicators and badges
-2. **Tournament Creation Wizard**
-    * Build multi-step form with progress indicator
+1. **Authentication Pages**
+    * Build login page (`/auth/login`) with form validation
+    * Create registration page (`/auth/register`) with terms acceptance
+    * Implement forgot password page with email input
+    * Add social authentication button components (Google, Discord)
+    * Create email verification success/pending pages
+    * Implement "Remember me" functionality UI
+    * Add subtle sponsor banner placements
+2. **Form Components & Validation**
+    * Create reusable form components with validation
+    * Implement real-time form validation with error messages
+    * Build password strength indicator
+    * Create checkbox components for terms and preferences
+    * Add form submission loading states
+    * Implement form error handling and display
+3. **User Profile Components**
+    * Build user profile page (`/profile/:username`) layout
+    * Create profile statistics and achievements display
+    * Implement tournament participation history components
+    * Build profile editing interface (`/profile/settings`)
+    * Create notification preferences panel
+    * Add profile picture upload component
+    * Build social links management interface
+4. **Dashboard Implementation (`/dashboard`)**
+    * Create tournament overview cards (created, participating, watching)
+    * Build quick action buttons with animations
+    * Implement recent activity feed component
+    * Create upcoming matches notification panel
+    * Build statistics summary widgets
+    * Add announcement feed from followed tournaments
+    * Integrate rotating sponsor banners in sidebar
+    * Create notification center with read/unread status
+5. **User Settings & Preferences**
+    * Build comprehensive settings page interface
+    * Create password change form with validation
+    * Implement notification preferences (email, push, in-app)
+    * Build communication settings panel
+    * Add privacy settings interface
+    * Create account deletion confirmation flow
+    * Build connected accounts management UI
+
+### Expected Deliverables:
+
+* Complete authentication UI flow
+* User dashboard with all widgets and components
+* Profile management system
+* Settings and preferences interfaces
+* Form validation and error handling system
+
+***
+
+## Phase 3: Tournament Management & Bracket Visualization
+
+**Objective:** Implement tournament creation, management interfaces, and interactive bracket visualization system.
+
+### Detailed Tasks:
+
+1. **Tournament Browser (`/tournaments`)**
+    * Create tournament listing with card-based layout
+    * Build advanced filtering system (status, format, game type)
+    * Implement search functionality with autocomplete
+    * Create category tabs (public, private, featured, sponsored)
+    * Add pagination controls with infinite scroll option
+    * Build sponsored tournament highlights section
+    * Create tournament quick preview modals
+2. **Tournament Creation Wizard (`/tournaments/create`)**
+    * Build multi-step form wizard component
     * Step 1: Basic information form (name, description, game type)
-    * Step 2: Format selection with visual previews
-    * Step 3: Advanced settings with conditional fields
-    * Step 4: Branding customization with image upload
-    * Step 5: Communication settings with template selection
+    * Step 2: Format selection interface (elimination type, participant limit)
+    * Step 3: Advanced settings panel (seeding, check-in requirements)
+    * Step 4: Branding customization (logo upload, color scheme)
+    * Step 5: Communication settings configuration
     * Step 6: Sponsor integration options
-    * Step 7: Preview and publication settings
-    * Add form validation and error handling
-3. **Tournament View Page**
-    * Create tournament header with key information
+    * Step 7: Publication settings and preview
+    * Add form persistence between steps
+    * Implement wizard navigation with progress indicator
+3. **Tournament View Interface (`/tournaments/:id`)**
+    * Create tournament information panel with all details
     * Build participant list with seeding display
-    * Implement match schedule table with status indicators
-    * Add tournament information panel with rules and details
-    * Create spectator section with comments/chat placeholder
-    * Build share functionality with social media buttons
-4. **Interactive Bracket Visualization**
-    * Create responsive bracket layout with CSS Grid/Flexbox
+    * Implement match schedule and results interface
+    * Add tournament announcements feed
+    * Create sponsor banner display areas
+    * Build registration status notifications
+    * Add social sharing buttons
+    * Create spectator engagement tools
+4. **Interactive Bracket System (`/tournaments/:id/bracket`)**
+    * Build scalable bracket visualization component
     * Implement zoom and pan controls for large tournaments
-    * Build match nodes with competitor information
-    * Add click handlers for match detail popovers
-    * Create bracket progression indicators
-    * Implement different tournament formats (single/double elimination, round-robin)
-5. **Tournament Administration Panel**
-    * Build admin dashboard with key metrics
-    * Create participant management interface with bulk actions
-    * Implement match result controls with dispute handling
-    * Add tournament settings modification form
-    * Create bracket regeneration tools
-    * Build export functionality (PDF, image, CSV)
+    * Create match detail popover components
+    * Add real-time update indicators with animations
+    * Build versus animation triggers for key matches
+    * Create match history timeline
+    * Integrate sponsor banners within bracket view
+    * Add bracket export functionality (PDF, image)
+5. **Tournament Administration Panel (`/tournaments/:id/admin`)**
+    * Create comprehensive admin dashboard
+    * Build participant management interface (approve, remove, seed)
+    * Implement bulk actions for participant management
+    * Create match result controls (report, dispute, override)
+    * Build tournament settings modification interface
+    * Add bracket regeneration tools
+    * Create analytics dashboard with charts
+    * Implement export options interface
 
 ### Expected Deliverables:
 
-* Complete tournament creation workflow
-* Fully functional tournament browser and search
+* Tournament browser with search and filtering
+* Complete tournament creation wizard
 * Interactive bracket visualization system
-* Tournament administration dashboard
-* Responsive design across all tournament pages
+* Tournament administration interface
+* Match management and result reporting system
 
 ***
 
-## Phase 3: User Interface & Animations
+## Phase 4: Communication Systems & Advanced Features
 
-**Objective:** Implement advanced animations, user profiles, and versus animation system
-
-### Detailed Tasks:
-
-1. **User Profile System**
-    * Create public profile page with statistics display
-    * Build tournament participation history with filtering
-    * Implement match record visualization with charts
-    * Add profile customization form for authenticated users
-    * Create social links and bio information display
-    * Build recent activity timeline component
-2. **Versus Animation System**
-    * Design full-screen versus animation layout
-    * Implement competitor entrance animations using Framer Motion
-    * Create countdown timer with visual effects
-    * Add match information overlay with smooth transitions
-    * Build interactive spectator engagement elements
-    * Integrate sponsor logo placement within animation sequence
-    * Add social sharing functionality with screenshot capability
-3. **Dashboard Implementation**
-    * Create tournament overview cards with quick stats
-    * Build recent activity feed with infinite scroll
-    * Implement upcoming matches notification panel
-    * Add statistics summary widgets with data visualization
-    * Create quick action buttons with hover effects
-    * Build announcement feed with expandable cards
-4. **Advanced UI Interactions**
-    * Implement smooth page transitions between routes
-    * Add loading states and skeleton screens
-    * Create hover effects and micro-interactions
-    * Build toast notification system for user feedback
-    * Implement drag-and-drop functionality for seeding
-    * Add keyboard navigation support for accessibility
-5. **Settings and Preferences**
-    * Build comprehensive settings page
-    * Implement password change functionality
-    * Create notification preferences with granular controls
-    * Add privacy settings and account management
-    * Build connected accounts management interface
-
-### Expected Deliverables:
-
-* Complete user profile and settings system
-* Fully animated versus reveal system
-* Interactive dashboard with real-time widgets
-* Comprehensive notification and feedback systems
-* Smooth animations and transitions throughout the app
-
-***
-
-## Phase 4: Communication & Notification Frontend
-
-**Objective:** Build comprehensive messaging, notification, and communication management interfaces
+**Objective:** Implement communication center, messaging system, sponsor management, and versus animation features.
 
 ### Detailed Tasks:
 
-1. **Notification Center**
-    * Create notification list with categorization
-    * Implement read/unread status indicators
-    * Build filter system (tournament updates, messages, sponsors)
-    * Add search functionality for notification history
-    * Create archive and delete operations
-    * Implement mark all as read functionality
-2. **Message Center Interface**
-    * Build conversation-style message display
-    * Create message threading and organization
-    * Implement message search and filtering
-    * Add attachment support for tournament-related files
-    * Build message composition interface
-    * Create message status indicators (sent, delivered, read)
-3. **Tournament Communication Center**
-    * Build rich text editor for announcements
-    * Create participant messaging interface with bulk selection
+1. **Communication Center (`/tournaments/:id/admin/communications`)**
+    * Build rich text announcement composer
+    * Create participant messaging interface (bulk/individual)
     * Implement message template system
-    * Add scheduling functionality for automated messages
-    * Build message history and delivery reports
+    * Build automated notification settings panel
+    * Create message history and delivery reports
+    * Add email template customization interface
+    * Build push notification management panel
     * Create sponsor message integration controls
-4. **Real-time Notification System**
-    * Implement toast notification component
-    * Create notification badge system for navigation
-    * Build browser push notification setup
-    * Add notification sound options
-    * Implement notification preferences interface
-    * Create notification action buttons (dismiss, view, etc.)
-5. **Sponsor Integration Frontend**
-    * Build banner management interface
-    * Create sponsor profile display components
-    * Implement banner rotation system
-    * Add sponsor content creation tools
-    * Build performance metrics dashboard
-    * Create revenue tracking interface
+2. **Message Center (`/messages`) & Notifications (`/notifications`)**
+    * Build comprehensive message center interface
+    * Create notification history with filtering
+    * Implement mark as read/unread functionality
+    * Add message threading and organization
+    * Create search functionality for messages
+    * Build archive and delete options
+    * Implement real-time message updates
+    * Add notification preferences quick access
+3. **Sponsor Management System (`/tournaments/:id/admin/sponsors`)**
+    * Create sponsor profile creation interface
+    * Build banner upload and scheduling system
+    * Implement sponsored content creation tools
+    * Add revenue tracking dashboard
+    * Create sponsor message broadcast interface
+    * Build banner performance metrics display
+    * Add contract and payment status tracking
+4. **Versus Animation System (`/versus/:matchId`)**
+    * Build full-screen animated matchup reveal
+    * Create competitor entrance animations with Framer Motion
+    * Implement match information display overlay
+    * Add countdown timer to match start
+    * Create interactive spectator engagement elements
+    * Integrate sponsor logo animations
+    * Build social sharing functionality for animations
+5. **Match Details & Advanced Features (`/matches/:id`)**
+    * Create detailed match view interface
+    * Build competitor profiles and statistics display
+    * Implement score reporting interface
+    * Add match chat/comments section
+    * Create stream embedding capability (Twitch integration placeholder)
+    * Build match history timeline between competitors
+    * Add sponsor content relevant to matches
+6. **Progressive Web App Features**
+    * Configure PWA manifest and service worker
+    * Implement offline capability for essential features
+    * Add app installation prompts
+    * Create push notification permission requests
+    * Build notification handling for PWA
+    * Add app icons and splash screens
 
 ### Expected Deliverables:
 
-* Complete notification and messaging system
-* Tournament communication management interface
-* Real-time notification infrastructure
-* Sponsor integration and management tools
-* Mobile-responsive communication features
+* Complete communication and messaging system
+* Sponsor management interface
+* Versus animation system
+* Match details and reporting interface
+* PWA functionality with offline support
 
 ***
 
-## Phase 5: Authentication & User Management
+## Phase 5: Complete Authentication System
 
-**Objective:** Implement complete user authentication, registration, and session management
+**Objective:** Implement comprehensive authentication using Supabase Auth with all security features and user management.
 
 ### Detailed Tasks:
 
 1. **Supabase Authentication Setup**
-    * Configure Supabase project with authentication providers
-    * Set up email/password authentication
-    * Configure OAuth providers (Google, Discord)
-    * Implement email verification workflow
-    * Set up password reset functionality
-2. **Authentication Components**
-    * Create login form with validation and error handling
-    * Build registration form with terms acceptance
-    * Implement forgot password interface
-    * Add social authentication buttons
-    * Create email verification confirmation page
-    * Build password reset form
-3. **Session Management**
-    * Implement authentication context provider
-    * Create protected route components
-    * Add automatic session refresh
-    * Implement logout functionality
-    * Build session timeout handling
-    * Create "remember me" functionality
+    * Configure Supabase project and authentication settings
+    * Set up authentication providers (email/password, Google, Discord)
+    * Configure email templates for verification and password reset
+    * Set up authentication redirects and callbacks
+    * Implement Row Level Security (RLS) policies
+    * Configure authentication middleware
+2. **Authentication Context & Hooks**
+    * Create React Context for authentication state
+    * Build custom hooks for authentication operations:
+        * `useAuth` for authentication state
+        * `useLogin` for login functionality
+        * `useRegister` for registration
+        * `useLogout` for logout operations
+        * `usePasswordReset` for password recovery
+        * `useProfile` for user profile management
+3. **Route Protection & Authorization**
+    * Implement protected route components
+    * Create role-based access control (tournament owner, participant, spectator)
+    * Build authentication guards for admin panels
+    * Implement automatic token refresh
+    * Add session timeout handling
+    * Create authentication error boundary components
 4. **User Profile Management**
-    * Set up user profile creation on registration
-    * Implement profile update functionality
-    * Add avatar upload with Supabase Storage
-    * Create username uniqueness validation
-    * Build account deletion workflow
-    * Implement privacy settings
-5. **Authorization System**
-    * Create role-based access control
-    * Implement tournament ownership verification
-    * Add participant authorization checks
-    * Create admin permission system
-    * Build spectator access controls
+    * Implement profile creation and updates
+    * Build user preferences and settings storage
+    * Create profile image upload with Supabase Storage
+    * Implement user statistics tracking
+    * Add notification preferences management
+    * Build account deletion functionality
+5. **Security Features**
+    * Implement email verification flow
+    * Add two-factor authentication preparation
+    * Create secure password requirements
+    * Implement rate limiting for authentication attempts
+    * Add suspicious activity detection
+    * Build account recovery mechanisms
 
 ### Expected Deliverables:
 
-* Fully functional authentication system
-* Complete user registration and login flow
-* Session management with automatic refresh
-* User profile management system
-* Role-based authorization implementation
+* Complete authentication system with Supabase
+* Protected routes and authorization
+* User profile management functionality
+* Security features and email verification
+* Authentication error handling and recovery
 
 ***
 
-## Phase 6: Core Backend Integration
+## Phase 6: Core Tournament & Real-time Features
 
-**Objective:** Implement database schema, core API endpoints, and tournament management backend
+**Objective:** Implement core tournament functionality, database schema, and real-time features using Supabase.
 
 ### Detailed Tasks:
 
 1. **Database Schema Design**
-    * Create users table with profile information
-    * Design tournaments table with all tournament settings
-    * Build participants table for tournament registration
-    * Create matches table with bracket structure
-    * Design messages and notifications tables
-    * Set up sponsors and banner management tables
-    * Implement Row Level Security (RLS) policies
-2. **Tournament Management Backend**
-    * Create tournament CRUD operations
-    * Implement bracket generation algorithms
-    * Build participant registration system
-    * Create match scheduling and result handling
-    * Implement tournament status management
-    * Add tournament search and filtering APIs
-3. **User Management APIs**
-    * Create user profile CRUD operations
-    * Implement user statistics calculation
-    * Build tournament participation history
-    * Create user search and discovery
-    * Implement privacy settings management
-4. **Match System Implementation**
-    * Create match result submission system
+    * Create tournaments table with all necessary fields
+    * Design participants table with registration status
+    * Build matches table for tournament bracket structure
+    * Create user\_profiles table with statistics
+    * Design tournament\_settings table for configurations
+    * Build match\_results table for score tracking
+    * Create notifications table for user alerts
+    * Implement proper foreign key relationships and constraints
+2. **Tournament Management API**
+    * Build tournament CRUD operations
+    * Implement participant registration and management
+    * Create bracket generation algorithms (single/double elimination, round-robin, Swiss)
+    * Build match creation and progression logic
+    * Implement seeding and randomization functions
+    * Create tournament status management
+    * Add tournament search and filtering capabilities
+3. **Real-time Features with Supabase**
+    * Set up real-time subscriptions for bracket updates
+    * Implement live match result updates
+    * Create real-time participant registration notifications
+    * Build live tournament status changes
+    * Add real-time spectator count updates
+    * Implement live chat for tournament pages
+    * Create real-time notification delivery
+4. **Match Management System**
+    * Build match result reporting functionality
     * Implement dispute resolution workflow
-    * Build match history tracking
-    * Create bracket progression logic
-    * Add match scheduling algorithms
-5. **Data Validation & Error Handling**
-    * Implement server-side validation for all forms
-    * Create comprehensive error response system
-    * Add input sanitization and security measures
-    * Build logging system for debugging
-    * Implement rate limiting for API endpoints
+    * Create automatic bracket progression
+    * Add match scheduling and timing
+    * Build winner determination logic
+    * Implement forfeit and walkover handling
+    * Create match history tracking
+5. **Statistics & Analytics**
+    * Build user performance tracking
+    * Create tournament analytics dashboard
+    * Implement participation history
+    * Add win/loss ratio calculations
+    * Create tournament completion rates
+    * Build advanced statistics queries
+    * Implement data export functionality
 
 ### Expected Deliverables:
 
-* Complete database schema with RLS policies
-* Tournament management backend system
-* User management and profile APIs
-* Match system with bracket logic
-* Comprehensive error handling and validation
+* Complete database schema with relationships
+* Tournament management API with real-time features
+* Match management and result tracking
+* Statistics and analytics system
+* Real-time subscription system
 
 ***
 
-## Phase 7: Real-time Features & External APIs
+## Phase 7: Communication, Notifications & Third-party Integrations
 
-**Objective:** Implement real-time updates, push notifications, and third-party integrations
+**Objective:** Implement comprehensive communication system, notification infrastructure, and integrate all third-party services.
 
 ### Detailed Tasks:
 
-1. **Real-time System Implementation**
-    * Set up Supabase real-time subscriptions
-    * Implement live bracket updates
-    * Create real-time match status changes
-    * Build live notification delivery
-    * Add real-time chat functionality
-    * Implement concurrent user handling
+1. **Communication System Backend**
+    * Set up email service integration (Supabase + SendGrid)
+    * Build message queue for bulk communications
+    * Create email template engine and management
+    * Implement automated message triggers
+    * Build announcement distribution system
+    * Create message delivery tracking
+    * Add communication analytics and reporting
 2. **Push Notification System**
     * Configure Web Push API integration
-    * Implement push notification service worker
-    * Create notification permission handling
-    * Build notification scheduling system
-    * Add notification preferences management
-    * Implement notification action handling
-3. **Email System Integration**
-    * Set up Supabase Edge Functions for email
-    * Create email template system
-    * Implement automated email workflows
-    * Build bulk email functionality
-    * Add email delivery tracking
-    * Create unsubscribe management
-4. **Twitch API Integration**
-    * Set up Twitch API authentication
-    * Implement stream embedding functionality
-    * Create stream status monitoring
-    * Add stream discovery for tournaments
-    * Build stream chat integration
-5. **Discord Integration**
-    * Configure Discord webhook system
-    * Implement tournament announcements to Discord
-    * Create match result notifications
-    * Build Discord bot commands for tournament info
-    * Add Discord role management for participants
+    * Build notification subscription management
+    * Create notification categories and preferences
+    * Implement push notification delivery
+    * Add notification batching and throttling
+    * Build notification analytics tracking
+    * Create notification template system
+3. **Email Automation with Supabase Edge Functions**
+    * Build tournament registration confirmation emails
+    * Create match reminder notifications
+    * Implement winner announcement emails
+    * Add tournament update notifications
+    * Build welcome email sequences
+    * Create password reset email handling
+    * Implement bulk email functionality
+4. **Third-party API Integrations**
+    * Integrate Twitch API for stream embedding
+    * Set up Discord webhooks for community notifications
+    * Configure Stripe integration for premium tournaments
+    * Add social media sharing APIs (Twitter, Facebook)
+    * Integrate Google Ad Manager for sponsor content
+    * Set up analytics tracking (Google Analytics)
+    * Build webhook handling system
+5. **Sponsor & Advertisement System**
+    * Build banner rotation system with scheduling
+    * Create sponsor content management API
+    * Implement banner performance tracking
+    * Add click-through rate analytics
+    * Build sponsor revenue tracking
+    * Create sponsored content delivery system
+    * Implement banner A/B testing framework
+6. **File Storage & Media Management**
+    * Set up Supabase Storage for tournament assets
+    * Build image processing for logos and banners
+    * Create file upload validation and security
+    * Implement image optimization and CDN delivery
+    * Add file versioning and backup
+    * Build media gallery for tournaments
+    * Create export file generation (PDF brackets)
 
 ### Expected Deliverables:
 
-* Real-time bracket and match updates
-* Complete push notification system
-* Automated email communication system
-* Twitch stream integration
-* Discord webhook integration
+* Complete communication and email system
+* Push notification infrastructure
+* Third-party API integrations
+* Sponsor and advertisement management
+* File storage and media handling
 
 ***
 
-## Phase 8: Advanced Features & Monetization
+## Phase 8: Testing, Optimization & PWA Implementation
 
-**Objective:** Implement sponsor system, premium features, and advanced tournament management
+**Objective:** Implement comprehensive testing, performance optimization, and complete PWA functionality.
 
 ### Detailed Tasks:
 
-1. **Sponsor Management System**
-    * Create sponsor profile management
-    * Implement banner upload and management
-    * Build banner rotation and scheduling
-    * Create sponsor analytics and reporting
-    * Implement sponsor message integration
-    * Add revenue tracking and payments
-2. **Advanced Tournament Features**
-    * Implement Swiss system tournaments
-    * Create custom bracket formats
-    * Build tournament templates system
-    * Add advanced seeding algorithms
-    * Implement check-in requirements
-    * Create tournament cloning functionality
-3. **Analytics and Reporting**
-    * Build tournament performance analytics
-    * Create user engagement metrics
-    * Implement sponsor ROI reporting
-    * Add match statistics tracking
-    * Create participation trend analysis
-    * Build custom report generation
-4. **Payment Integration**
-    * Set up Stripe payment processing
-    * Implement premium tournament features
-    * Create subscription management
-    * Build invoice generation system
-    * Add payment history tracking
-    * Implement refund processing
-5. **Progressive Web App Features**
-    * Configure service worker for offline functionality
-    * Implement app manifest for installability
-    * Add offline data caching
-    * Create background sync for actions
-    * Build app update notifications
+1. **Testing Implementation**
+    * Set up Jest and React Testing Library
+    * Create unit tests for all utility functions
+    * Build component testing suite
+    * Implement integration tests for user flows
+    * Add API endpoint testing
+    * Create E2E tests with Playwright or Cypress
+    * Build automated test pipeline
+2. **Performance Optimization**
+    * Implement code splitting and lazy loading
+    * Optimize React Query caching strategies
+    * Add image optimization and lazy loading
+    * Implement bundle size optimization
+    * Create performance monitoring
+    * Optimize database queries and indexes
+    * Add CDN configuration for static assets
+3. **PWA Enhancement**
+    * Complete service worker implementation
+    * Add offline functionality for critical features
+    * Implement background sync for data updates
+    * Create app installation banners
+    * Build notification handling for PWA
+    * Add app shortcuts and widgets
+    * Implement app update notifications
+4. **Real-time Optimization**
+    * Optimize WebSocket connections
+    * Implement connection pooling
+    * Add real-time data throttling
+    * Create offline real-time queue
+    * Optimize Supabase real-time performance
+    * Add connection retry logic
+    * Implement real-time error handling
+5. **Mobile Responsiveness & UX**
+    * Complete mobile optimization for all screens
+    * Implement touch gestures for bracket navigation
+    * Add mobile-specific animations
+    * Optimize loading states for mobile
+    * Create mobile notification handling
+    * Add haptic feedback for interactions
+    * Implement mobile-first error states
+6. **Accessibility & SEO**
+    * Complete WCAG 2.1 compliance audit
+    * Implement proper ARIA labels
+    * Add keyboard navigation for all features
+    * Create screen reader optimization
+    * Implement SEO meta tags and structured data
+    * Add Open Graph tags for social sharing
+    * Create sitemap and robots.txt
 
 ### Expected Deliverables:
 
-* Complete sponsor management and monetization system
-* Advanced tournament management features
-* Comprehensive analytics and reporting
-* Payment processing integration
-* Full PWA functionality
+* Comprehensive test suite with automation
+* Performance-optimized application
+* Complete PWA functionality
+* Mobile-optimized user experience
+* Accessibility compliance
+* SEO optimization
 
 ***
 
-## Phase 9: Review & Quality Assurance
+## Phase 9: Final Review, Security Audit & Launch Preparation
 
-**Objective:** Comprehensive testing, code review, security audit, and performance optimization
+**Objective:** Conduct final security review, code refactoring, feature verification, and prepare for production deployment.
 
 ### Detailed Tasks:
 
-1. **Code Review and Refactoring**
-    * Review all components for code quality and consistency
-    * Refactor duplicate code into reusable utilities
-    * Optimize component performance with React.memo and useMemo
-    * Ensure TypeScript types are comprehensive and accurate
-    * Review and standardize error handling patterns
-    * Optimize bundle size and implement code splitting
-2. **Security Audit and Implementation**
-    * Review and test all RLS policies in Supabase
-    * Implement input sanitization and validation
-    * Add CSRF protection for forms
-    * Review authentication flows for security vulnerabilities
-    * Implement proper session management
-    * Add security headers and configure HTTPS
-3. **Performance Optimization**
-    * Optimize images and implement lazy loading
-    * Review and optimize database queries
-    * Implement caching strategies for frequently accessed data
-    * Optimize real-time subscriptions to prevent memory leaks
-    * Add performance monitoring and error tracking
-    * Optimize Lighthouse scores for PWA compliance
-4. **Testing and Quality Assurance**
-    * Test all user flows from the PRD thoroughly
-    * Verify responsive design across all screen sizes
-    * Test real-time features with multiple concurrent users
-    * Validate email and push notification delivery
-    * Test payment processing in sandbox environment
-    * Verify all third-party integrations (Twitch, Discord)
-5. **Feature Verification**
-    * Verify all PRD requirements are implemented
-    * Test tournament creation and management workflows
-    * Validate communication and notification systems
-    * Test sponsor integration and banner systems
-    * Verify versus animations and bracket visualizations
-    * Ensure all admin controls function properly
-6. **Documentation and Deployment**
-    * Create user documentation and help guides
-    * Document API endpoints and data structures
-    * Set up production deployment pipeline
-    * Configure monitoring and logging systems
-    * Create backup and disaster recovery procedures
-    * Implement analytics tracking for user behavior
+1. **Security Audit & Hardening**
+    * Review and test Row Level Security (RLS) policies
+    * Audit authentication and authorization flows
+    * Test input validation and sanitization
+    * Review API security and rate limiting
+    * Audit file upload security measures
+    * Test SQL injection and XSS prevention
+    * Review and secure environment variables
+    * Implement security headers and HTTPS enforcement
+2. **Code Quality & Refactoring**
+    * Complete code review for all components
+    * Refactor duplicate code into reusable functions
+    * Optimize component architecture and patterns
+    * Implement consistent error handling
+    * Review and optimize state management
+    * Clean up unused imports and dependencies
+    * Implement consistent coding standards
+    * Add comprehensive code documentation
+3. **Feature Verification & Testing**
+    * Verify all PRD requirements implementation:
+        * Tournament creation and management ✓
+        * Dynamic bracket visualization ✓
+        * Versus animations ✓
+        * Participant management ✓
+        * Match reporting and real-time updates ✓
+        * Communication system ✓
+        * Sponsor integration ✓
+        * Mobile responsive design ✓
+        * Push notifications ✓
+        * Email automation ✓
+    * Test all user flows end-to-end
+    * Verify real-time functionality
+    * Test notification delivery
+    * Verify sponsor integration features
+4. **Performance & Load Testing**
+    * Conduct load testing for concurrent users
+    * Test database performance under load
+    * Verify real-time scalability
+    * Test file upload and storage limits
+    * Benchmark API response times
+    * Test notification delivery at scale
+    * Verify CDN and caching performance
+5. **Production Deployment Preparation**
+    * Set up production Supabase environment
+    * Configure production environment variables
+    * Set up monitoring and logging
+    * Configure backup and disaster recovery
+    * Set up error tracking (Sentry integration)
+    * Configure analytics and performance monitoring
+    * Prepare deployment scripts and CI/CD pipeline
+6. **Documentation & Launch Materials**
+    * Create comprehensive API documentation
+    * Build user guide and help documentation
+    * Create admin training materials
+    * Document deployment and maintenance procedures
+    * Prepare marketing assets and demo content
+    * Create troubleshooting guides
+    * Document sponsor integration procedures
+7. **Final Quality Assurance**
+    * Cross-browser compatibility testing
+    * Mobile device testing across platforms
+    * Performance testing on various network conditions
+    * Accessibility testing with screen readers
+    * Final security penetration testing
+    * User acceptance testing with stakeholders
+    * Bug fixes and final optimizations
 
 ### Expected Deliverables:
 
-* Fully tested and optimized application
-* Complete security audit and fixes
-* Performance-optimized production build
+* Security-audited and hardened application
+* Refactored and optimized codebase
+* Complete feature verification checklist
+* Production-ready deployment
 * Comprehensive documentation
-* Production deployment with monitoring
-* Verified implementation of all PRD requirements
+* Monitoring and analytics setup
+* Launch-ready tournament management platform
