@@ -104,7 +104,7 @@ export default function Header() {
                   </button>
 
                   {profileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 glass-strong rounded-xl shadow-glass-strong py-2 z-50 border border-white/20">
+                    <div className="absolute right-0 mt-2 w-48 glass-strong rounded-xl shadow-glass-strong py-2 z-[99998] border border-white/20">
                       <button
                         onClick={() => {
                           setProfileModalOpen(true);
