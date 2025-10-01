@@ -13,6 +13,7 @@ export interface Match {
   winner?: Participant;
   round: number;
   matchNumber: number;
+  isVersusEligible?: boolean; // For semifinals and finals
 }
 
 export interface Group {
@@ -102,6 +103,76 @@ export function generateFixturesBracket(participants: Participant[]): Match[] {
   return matches;
 }
 
+/**
+ * Generates a double-elimination bracket.
+ * @param participants The list of participants.
+ * @returns An object containing winners bracket and losers bracket matches.
+ */
+export function generateDoubleEliminationBracket(participants: Participant[]): {
+  winnersBracket: Match[];
+  losersBracket: Match[];
+} {
+  const winnersBracket: Match[] = [];
+  const losersBracket: Match[] = [];
+  
+  // Generate winners bracket (same as single elimination)
+  const singleElimMatches = generateFixturesBracket(participants);
+  winnersBracket.push(...singleElimMatches.map(match => ({
+    ...match,
+    id: `winners-${match.id}`,
+    isVersusEligible: match.round >= Math.max(1, singleElimMatches.length - 2) // Last 2 rounds
+  })));
+  
+  // Generate losers bracket (simplified version)
+  const losersRounds = Math.ceil(Math.log2(participants.length)) * 2 - 1;
+  
+  for (let round = 1; round <= losersRounds; round++) {
+    const matchesInRound = Math.max(1, Math.floor(participants.length / Math.pow(2, Math.ceil(round / 2))));
+    
+    for (let matchNum = 1; matchNum <= matchesInRound; matchNum++) {
+      losersBracket.push({
+        id: `losers-${round}-${matchNum}`,
+        round,
+        matchNumber: matchNum,
+        isVersusEligible: round >= losersRounds - 1 // Last 2 rounds
+      });
+    }
+  }
+  
+  return { winnersBracket, losersBracket };
+}
+
+/**
+ * Generates a Swiss system tournament.
+ * @param participants The list of participants.
+ * @param rounds Number of rounds to play.
+ * @returns An array of matches for all rounds.
+ */
+export function generateSwissBracket(participants: Participant[], rounds: number = 5): Match[] {
+  const matches: Match[] = [];
+  let currentStandings = [...participants];
+  
+  for (let round = 1; round <= rounds; round++) {
+    // Sort by current standings (simplified - in real implementation would use Swiss pairing algorithm)
+    currentStandings.sort((a, b) => a.seed - b.seed);
+    
+    // Pair participants
+    for (let i = 0; i < currentStandings.length; i += 2) {
+      if (i + 1 < currentStandings.length) {
+        matches.push({
+          id: `swiss-${round}-${Math.floor(i / 2) + 1}`,
+          participant1: currentStandings[i],
+          participant2: currentStandings[i + 1],
+          round,
+          matchNumber: Math.floor(i / 2) + 1,
+          isVersusEligible: round >= rounds - 1 // Last round
+        });
+      }
+    }
+  }
+  
+  return matches;
+}
 /**
  * Generates a group stage followed by a knockout bracket.
  * @param participants The list of participants.

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Trophy, Users, Calendar, Zap, ArrowRight } from 'lucide-react';
+import { Trophy, Users, Calendar, Zap, ArrowRight, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Button from '../ui/Button';
 import AuthModal from '../auth/AuthModal';
+import SponsorBanner from '../ui/SponsorBanner';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function HeroSection() {
@@ -15,6 +16,21 @@ export default function HeroSection() {
     setAuthModalOpen(true);
   };
 
+  // Mock sponsor banners for demo
+  const mockSponsorBanners = [
+    {
+      id: '1',
+      sponsor_name: 'Gaming Gear Pro',
+      banner_url: 'https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=200&fit=crop',
+      click_url: 'https://example.com/gaming-gear'
+    },
+    {
+      id: '2', 
+      sponsor_name: 'Esports Arena',
+      banner_url: 'https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg?auto=compress&cs=tinysrgb&w=400&h=200&fit=crop',
+      click_url: 'https://example.com/esports-arena'
+    }
+  ];
   return (
     <>
       <div className="relative overflow-hidden">
@@ -31,24 +47,25 @@ export default function HeroSection() {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
               {user ? (
                 <>
-                  <Link to="/tournaments" className="w-full sm:w-auto">
+                  <Link to="/versus/demo-match-hero" className="w-full sm:w-auto">
                     <Button 
                       size="lg" 
                       variant="frog"
                       className="frog-effect w-full sm:w-auto"
                     >
-                      <Trophy className="h-5 w-5 mr-2" />
-                      Voir les tournois
+                      <Play className="h-5 w-5 mr-2" />
+                      Voir une animation Versus
                       <ArrowRight className="h-5 w-5 ml-2" />
                     </Button>
                   </Link>
-                  <Link to="/dashboard" className="w-full sm:w-auto">
+                  <Link to="/tournaments" className="w-full sm:w-auto">
                     <Button 
                       size="lg" 
                       variant="glass"
                       className="frog-effect w-full sm:w-auto"
                     >
-                      Mon tableau de bord
+                      <Trophy className="h-5 w-5 mr-2" />
+                      Voir les tournois
                     </Button>
                   </Link>
                 </>
@@ -73,6 +90,19 @@ export default function HeroSection() {
                   </Button>
                 </>
               )}
+            </div>
+          </div>
+
+          {/* Sponsor Banner Section */}
+          <div className="mt-16 sm:mt-20">
+            <div className="text-center mb-6">
+              <h3 className="text-lg font-semibold text-white/90 mb-2">Nos partenaires</h3>
+            </div>
+            <div className="max-w-md mx-auto">
+              <SponsorBanner 
+                banners={mockSponsorBanners}
+                className="h-24"
+              />
             </div>
           </div>
 

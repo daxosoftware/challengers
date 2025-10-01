@@ -1,4 +1,5 @@
 import { Calendar, Users, Trophy } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Tournament } from '../../types';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
@@ -16,6 +17,8 @@ export default function TournamentCard({
   onJoin, 
   showActions = true 
 }: TournamentCardProps) {
+  const navigate = useNavigate();
+
   const statusColors = {
     draft: 'default',
     registration_open: 'success',
@@ -36,6 +39,10 @@ export default function TournamentCard({
     round_robin: 'Round Robin',
   };
 
+  const handleViewVersus = () => {
+    // Navigate to versus animation for demo purposes
+    navigate(`/versus/demo-match-${tournament.id}`);
+  };
   return (
     <article className="card-glass p-4 md:p-6 rounded-2xl hover:card-frog transition-all duration-300" role="article" aria-labelledby={`tournament-${tournament.id}-title`}>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 space-y-2 sm:space-y-0">
@@ -92,6 +99,17 @@ export default function TournamentCard({
           >
             Voir détails
           </Button>
+          {tournament.status === 'in_progress' && (
+            <Button
+              variant="frog"
+              size="sm"
+              onClick={handleViewVersus}
+              className="flex-1"
+              aria-label={`Voir l'animation versus du tournoi ${tournament.name}`}
+            >
+              Versus
+            </Button>
+          )}
           {tournament.status === 'registration_open' && (
             <Button
               variant="frog"

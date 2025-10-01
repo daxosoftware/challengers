@@ -291,9 +291,39 @@ export default function CreateTournamentModal({
                       <label className="flex items-start p-4 glass rounded-lg cursor-pointer hover:glass-strong transition-all">
                         <input
                           type="radio"
+                          value="double_elimination"
+                          checked={formData.format === 'double_elimination'}
+                          onChange={(e) => setFormData(prev => ({ ...prev, format: e.target.value as any }))}
+                          className="mt-1 mr-3 accent-frog-primary"
+                        />
+                        <div>
+                          <div className="font-medium text-white">Double élimination</div>
+                          <div className="text-sm text-white/80">
+                            Deux défaites pour être éliminé. Plus équitable et spectaculaire.
+                          </div>
+                        </div>
+                      </label>
+                      <label className="flex items-start p-4 glass rounded-lg cursor-pointer hover:glass-strong transition-all">
+                        <input
+                          type="radio"
+                          value="swiss"
+                          checked={formData.format === 'swiss'}
+                          onChange={(e) => setFormData(prev => ({ ...prev, format: e.target.value as any }))}
+                          className="mt-1 mr-3 accent-frog-primary"
+                        />
+                        <div>
+                          <div className="font-medium text-white">Système suisse</div>
+                          <div className="text-sm text-white/80">
+                            Tous les participants jouent le même nombre de matchs. Idéal pour les grands tournois.
+                          </div>
+                        </div>
+                      </label>
+                      <label className="flex items-start p-4 glass rounded-lg cursor-pointer hover:glass-strong transition-all">
+                        <input
+                          type="radio"
                           value="group_stage"
                           checked={formData.format === 'group_stage'}
-                          onChange={(e) => setFormData(prev => ({ ...prev, format: e.target.value as 'group_stage' }))}
+                          onChange={(e) => setFormData(prev => ({ ...prev, format: e.target.value as any }))}
                           className="mt-1 mr-3 accent-frog-primary"
                         />
                         <div>

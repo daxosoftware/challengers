@@ -11,7 +11,7 @@ export interface Tournament {
   id: string;
   name: string;
   description?: string;
-  format: 'single_elimination' | 'double_elimination' | 'round_robin';
+  format: 'single_elimination' | 'double_elimination' | 'round_robin' | 'swiss';
   max_participants: number;
   current_participants: number;
   status: 'draft' | 'registration_open' | 'in_progress' | 'completed';
@@ -23,6 +23,18 @@ export interface Tournament {
   prize_pool?: string;
   entry_fee?: number;
   rules?: string;
+  sponsor_banners?: SponsorBanner[];
+}
+
+export interface SponsorBanner {
+  id: string;
+  tournament_id: string;
+  sponsor_name: string;
+  banner_url: string;
+  click_url?: string;
+  display_order: number;
+  active: boolean;
+  created_at: string;
 }
 
 export interface Participant {

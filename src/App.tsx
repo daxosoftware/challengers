@@ -12,6 +12,7 @@ import { ErrorBoundary, AuthErrorBoundary } from './components/ErrorBoundary';
 const HomePage = lazy(() => import('./components/home/HomePage'));
 const TournamentList = lazy(() => import('./components/tournaments/TournamentList'));
 const Dashboard = lazy(() => import('./components/dashboard/Dashboard'));
+const VersusAnimation = lazy(() => import('./components/versus/VersusAnimation'));
 
 function AppContent() {
   const { loading, user } = useAuth();
@@ -70,6 +71,7 @@ function AppContent() {
                     <Routes>
                       <Route path="/" element={<HomePage />} />
                       <Route path="/tournaments" element={<TournamentList />} />
+                      <Route path="/versus/:matchId" element={<VersusAnimation />} />
                       <Route
                         path="/dashboard"
                         element={user ? <Dashboard /> : <Navigate to="/" replace />}
